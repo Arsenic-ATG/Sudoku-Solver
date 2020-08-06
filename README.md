@@ -1,5 +1,5 @@
 # sudoku-solver
-finding a way to solve sudoku using backtracking.
+program that solves sudoku in less than a second
 
 ## INPUT INSTRUCTIONS (console version)
 input the sudoku row by row and use 0 at the place of empty box(some samples are already attached)
