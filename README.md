@@ -1,4 +1,4 @@
-# sudoku-solver
+# Sudoku-Solver
 program that solves sudoku in less than a second
 
 ## INPUT INSTRUCTIONS (console version)
