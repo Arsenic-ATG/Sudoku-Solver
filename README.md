@@ -1,5 +1,5 @@
 # Sudoku-Solver
-program that solves sudoku in less than a second
+program that solves [sudoku](https://en.wikipedia.org/wiki/Sudoku) in less than a second
 
 ## INPUT INSTRUCTIONS (console version)
 Input the sudoku row by row and use 0 at the place of empty box ([sample inputs](https://github.com/Arsenic-ATG/Sudoku-Solver/blob/master/sample%20input.sty) are already attached)
