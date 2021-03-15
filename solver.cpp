@@ -6,7 +6,7 @@
 
 // This is the limit of size of sudoku board for now
 // you can increase it but larger the sudoku, longer will be time taken to solve it.
-#define MAX 10
+#define MAX 9
 
 /**** function declarations ****/
 
@@ -31,12 +31,18 @@ int main()
     // Input
     takeInput(sudoku);
 
-    // Processing and output
+    // Processing
     std::cout<<"\n\nFinding Solution!\n\n";
     SolveSudoku(sudoku, solved_flag);
    
+    // output
     if(!solved_flag)
         std::cout<<"Invalid Board!\n";
+    else
+    {
+        std::cout<<"solution found !\n";
+        displaySolution(sudoku);
+    }
 
     return 0;
 }
@@ -45,18 +51,18 @@ int main()
 
 void takeInput(int sudoku[][MAX])
 {
-    std::cout<<"Enter the Initial "<<MAX-1<<" X "<<MAX-1<<" Sudoku "<<std::endl;
+    std::cout<<"Enter the Initial "<<MAX<<" X "<<MAX<<" Sudoku "<<std::endl;
     std::cout<<"Instruction: Enter 0 for blank"<<std::endl;
     
-    for(int i = 0 ; i < (MAX-1) ; i++)
-        for(int j = 0 ; j< (MAX-1) ; j++)
+    for(int i = 0 ; i < (MAX) ; i++)
+        for(int j = 0 ; j< (MAX) ; j++)
             std::cin>>sudoku[i][j];
 }
 
 //Function to display Sudoku Board
 void displaySolution(int sudoku[][MAX])
 {
-    for(int i=0;i<(MAX-1);i++)
+    for(int i=0;i<(MAX);i++)
     {   
         if(i%3==0 && i)
         {
@@ -67,7 +73,7 @@ void displaySolution(int sudoku[][MAX])
                 std::cout<<std::endl;
         }   
 
-        for(int j=0;j<(MAX-1); j++)
+        for(int j=0;j<(MAX); j++)
         {
             if(j%3==0 && j) 
                 std::cout<<"|| ";
@@ -81,8 +87,8 @@ void displaySolution(int sudoku[][MAX])
 //to check whether the sudoku is full or not
 bool isFull(int sudoku[][MAX])
 {
-    for(int i = 0 ; i < (MAX-1) ; i++)
-        for(int j = 0 ; j < (MAX-1) ; j++)
+    for(int i = 0 ; i < (MAX) ; i++)
+        for(int j = 0 ; j < (MAX) ; j++)
             if(sudoku[i][j] == 0)
                 return false;
     return true;
@@ -92,15 +98,15 @@ int findPossibleValues(int sudoku[][MAX], int a[], int r, int c)
 {
     int n=0;
     int i,j;
-    const int s = static_cast<int>(sqrt((MAX-1)));
+    const int s = static_cast<int>(sqrt((MAX)));
     int b[MAX+1]={0};
 
     //Note numbers appeared in current row
-    for(i = 0; i < (MAX-1) ; i++)
+    for(i = 0; i < (MAX) ; i++)
         b[sudoku[r][i]]=1;
 
     //Note numbers appeared in current column
-    for(i = 0; i < (MAX-1) ; i++)
+    for(i = 0; i < (MAX) ; i++)
         b[sudoku[i][c]]=1;
 
     //Note numbers appeared in current block
@@ -110,7 +116,7 @@ int findPossibleValues(int sudoku[][MAX], int a[], int r, int c)
             b[sudoku[i][j]]=1;
 
     //Fill array a[] with numbers that can be filled in that perticular cell
-    for(i = 1 ; i <= (MAX-1); i++)
+    for(i = 1 ; i <= (MAX); i++)
         if(!b[i])
             a[n++]=i;
 
@@ -123,19 +129,17 @@ void SolveSudoku(int sudoku[][MAX], bool &solved_flag)
     int i, j, a[MAX+1]={0}, n=0;
 
     // base case
-    if(isFull(sudoku))
+    if(solved_flag || isFull(sudoku))
     {
     	solved_flag = 1;
-    	std::cout<<"successfully solved !\n\n";
-    	displaySolution(sudoku);
         return;
     }
 
     // find next empty place on sudoku
     bool break_flag = 0;
-    for(i = 0 ; i < (MAX-1) ; i++)
+    for(i = 0 ; i < (MAX) ; i++)
     {
-        for(j = 0 ; j < (MAX-1) ; j++)
+        for(j = 0 ; j < (MAX) ; j++)
             if(!sudoku[i][j])
             {
                 break_flag = 1;
@@ -153,6 +157,9 @@ void SolveSudoku(int sudoku[][MAX], bool &solved_flag)
         sudoku[i][j] = a[l];
         //now solve the updated board
         SolveSudoku(sudoku, solved_flag);
+
+        if(solved_flag)
+            return;
     }
 
     // nothing worked so reset and backtrack
