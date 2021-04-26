@@ -1,66 +1,49 @@
-/**** headers ****/
 #include <iostream>
 #include <cmath>
+#include <vector>
 
-/**** constants ****/
+/**** sudoku class ****/
+class sudoku {
+    const int MAX;
+    std::vector <std::vector<int>> board;
+    bool is_solved;
+    bool is_full();
+    int find_possible_values(std::vector<int> &, int , int );
 
-// This is the limit of size of sudoku board for now
-// you can increase it but larger the sudoku, longer will be time taken to solve it.
-#define MAX 9
-
-/**** function declarations ****/
-
-// utility functions
-void takeInput(int[][MAX]);
-void displaySolution(int [][MAX]);
-bool isFull(int [][MAX]);
-int findPossibleValues(int [][MAX], int [], int , int );
-
-// solver function
-void SolveSudoku(int [][MAX], bool &);
-
-/**** the main() function ****/
-
-int main()
-{
-    // configuring vars
-    int sudoku[MAX][MAX] = {0};
-    int solution_num = 1;
-    bool solved_flag = 0;
-
-    // Input
-    takeInput(sudoku);
-
-    // Processing
-    std::cout<<"\n\nFinding Solution!\n\n";
-    SolveSudoku(sudoku, solved_flag);
-   
-    // output
-    if(!solved_flag)
-        std::cout<<"Invalid Board!\n";
-    else
+public:
+    sudoku() : MAX(9)
     {
-        std::cout<<"solution found !\n";
-        displaySolution(sudoku);
+        is_solved = false;
+
+        // resize the vector
+        board.resize(MAX);
+        for (int i = 0; i < MAX; ++i)
+            board[i].resize(MAX);
+
+        // TODO: call generate_sudoku() to generate a random board on construction
     }
 
-    return 0;
-}
+    void take_input();
+    void display_solution();
+    void solve();
+};
 
-/**** function definations ****/
+/**** function definitions ****/
 
-void takeInput(int sudoku[][MAX])
+// taking input from cosole 
+// TODO: overload straem operator for i/o
+void sudoku::take_input()
 {
     std::cout<<"Enter the Initial "<<MAX<<" X "<<MAX<<" Sudoku "<<std::endl;
     std::cout<<"Instruction: Enter 0 for blank"<<std::endl;
     
     for(int i = 0 ; i < (MAX) ; i++)
         for(int j = 0 ; j< (MAX) ; j++)
-            std::cin>>sudoku[i][j];
+            std::cin>>board[i][j];
 }
 
-//Function to display Sudoku Board
-void displaySolution(int sudoku[][MAX])
+// pretty print sudoku board to console
+void sudoku::display_solution()
 {
     for(int i=0;i<(MAX);i++)
     {   
@@ -77,70 +60,71 @@ void displaySolution(int sudoku[][MAX])
         {
             if(j%3==0 && j) 
                 std::cout<<"|| ";
-            std::cout<<sudoku[i][j]<<" ";
+            std::cout<<board[i][j]<<" ";
         }
         std::cout<<std::endl;
     }
     std::cout<<"\n\n*************************************************\n\n";
 }
 
-//to check whether the sudoku is full or not
-bool isFull(int sudoku[][MAX])
+//to check whether the board is full or not
+bool sudoku::is_full()
 {
     for(int i = 0 ; i < (MAX) ; i++)
         for(int j = 0 ; j < (MAX) ; j++)
-            if(sudoku[i][j] == 0)
+            if(board[i][j] == 0)
                 return false;
     return true;
 }
 
-int findPossibleValues(int sudoku[][MAX], int a[], int r, int c)
+int sudoku::find_possible_values(std::vector<int> &possible_values, int r, int c)
 {
     int n=0;
     int i,j;
     const int s = static_cast<int>(sqrt((MAX)));
-    int b[MAX+1]={0};
+    std::vector<int> b(MAX+1,0);
 
-    //Note numbers appeared in current row
+    // Note numbers appeared in current row
     for(i = 0; i < (MAX) ; i++)
-        b[sudoku[r][i]]=1;
+        b[board[r][i]]=1;
 
-    //Note numbers appeared in current column
+    // Note numbers appeared in current column
     for(i = 0; i < (MAX) ; i++)
-        b[sudoku[i][c]]=1;
+        b[board[i][c]]=1;
 
-    //Note numbers appeared in current block
+    // Note numbers appeared in current block
     r = (r/s)*s, c = (c/s)*s;
     for(i = r; i < r+s; i++)
         for(j = c ; j < c+s ; j++)
-            b[sudoku[i][j]]=1;
+            b[board[i][j]]=1;
 
-    //Fill array a[] with numbers that can be filled in that perticular cell
+    // Fill array possible_values[] with numbers that can be filled in that perticular cell
     for(i = 1 ; i <= (MAX); i++)
         if(!b[i])
-            a[n++]=i;
+            possible_values[n++]=i;
 
     return n;
 }
 
 
-void SolveSudoku(int sudoku[][MAX], bool &solved_flag)
+void sudoku::solve()
 {
-    int i, j, a[MAX+1]={0}, n=0;
+    int i, j, n = 0;
+    std::vector<int> possible_values(MAX+1,0);
 
     // base case
-    if(solved_flag || isFull(sudoku))
+    if(is_solved || is_full())
     {
-    	solved_flag = 1;
+        is_solved = 1;
         return;
     }
 
-    // find next empty place on sudoku
+    // find next empty place on board
     bool break_flag = 0;
     for(i = 0 ; i < (MAX) ; i++)
     {
         for(j = 0 ; j < (MAX) ; j++)
-            if(!sudoku[i][j])
+            if(!board[i][j])
             {
                 break_flag = 1;
                 break;
@@ -150,19 +134,39 @@ void SolveSudoku(int sudoku[][MAX], bool &solved_flag)
             break;
     }
 
-    //fill the array with all the possible values that we can fill in that empty cell
-    n = findPossibleValues(sudoku, a, i, j);
+    // fill the array with all the possible values that we can fill in that empty cell
+    n = find_possible_values(possible_values, i, j);
     for(int l = 0 ; l < n ; l++)
     {
-        sudoku[i][j] = a[l];
-        //now solve the updated board
-        SolveSudoku(sudoku, solved_flag);
+        board[i][j] = possible_values[l];
+        // solve the updated board
+        solve();
 
-        if(solved_flag)
+        if(is_solved)
             return;
     }
 
     // nothing worked so reset and backtrack
-    sudoku[i][j]=0;
+    board[i][j]=0;
 }
 
+
+/**** the main() function ****/
+
+int main()
+{
+    // configuring vars
+    sudoku board;
+
+    // Input
+    board.take_input();
+
+    // Processing
+    std::cout<<"\n\nFinding Solution!\n\n";
+    board.solve();
+
+    // output
+    board.display_solution();
+
+    return 0;
+}
