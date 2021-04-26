@@ -20,9 +20,13 @@ public:
         for (int i = 0; i < MAX; ++i)
             board[i].resize(MAX);
 
-        // TODO: call generate_sudoku() to generate a random board on construction
+        // generate a blank board
+        for (int i = 0; i < MAX; ++i)
+            for (int j = 0; j < MAX; ++j)
+                board[i][j] = 0;
     }
 
+    // TODO: create generate_sudoku() to generate a random board on call
     void take_input();
     void display_solution();
     void solve();
