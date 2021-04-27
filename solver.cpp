@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -27,48 +28,50 @@ public:
     }
 
     // TODO: create generate_sudoku() to generate a random board on call
-    void take_input();
-    void display_solution();
+    // void take_input();
+    // void display_solution();
     void solve();
+    friend std::istream &operator >>( std::istream  &input,sudoku &);
+    friend std::ostream &operator <<( std::ostream &, const sudoku &);
+
 };
 
 /**** function definitions ****/
 
-// taking input from cosole 
-// TODO: overload straem operator for i/o
-void sudoku::take_input()
+std::istream &operator >>( std::istream  &input , sudoku &s)
 {
-    std::cout<<"Enter the Initial "<<MAX<<" X "<<MAX<<" Sudoku "<<std::endl;
-    std::cout<<"Instruction: Enter 0 for blank"<<std::endl;
-    
-    for(int i = 0 ; i < (MAX) ; i++)
-        for(int j = 0 ; j< (MAX) ; j++)
-            std::cin>>board[i][j];
+    for(int i = 0 ; i < (s.MAX) ; i++)
+        for(int j = 0 ; j < (s.MAX) ; j++)
+            input>>s.board[i][j];
+
+    return input;
 }
 
 // pretty print sudoku board to console
-void sudoku::display_solution()
+std::ostream &operator <<( std::ostream & output, const sudoku &s)
 {
-    for(int i=0;i<(MAX);i++)
+    for(int i = 0;i < (s.MAX) ;i++)
     {   
-        if(i%3==0 && i)
+        if(i%3 == 0 && i)
         {
-             for(int j=0;j<24; j++)
+             for(int j = 0;j < 24; j++)
                 {
-                    std::cout<<"=";
+                    output<<"=";
                 }
-                std::cout<<std::endl;
+                output<<'\n';
         }   
 
-        for(int j=0;j<(MAX); j++)
+        for(int j = 0;j < (s.MAX); j++)
         {
-            if(j%3==0 && j) 
-                std::cout<<"|| ";
-            std::cout<<board[i][j]<<" ";
+            if(j%3 == 0 && j) 
+                output<<"|| ";
+            output<<s.board[i][j]<<" ";
         }
-        std::cout<<std::endl;
+        output<<std::endl;
     }
-    std::cout<<"\n\n*************************************************\n\n";
+    output<<"\n\n*************************************************\n\n";
+
+    return output;
 }
 
 //to check whether the board is full or not
@@ -83,29 +86,29 @@ bool sudoku::is_full()
 
 int sudoku::find_possible_values(std::vector<int> &possible_values, int r, int c)
 {
-    int n=0;
+    int n = 0;
     int i,j;
     const int s = static_cast<int>(sqrt((MAX)));
     std::vector<int> b(MAX+1,0);
 
     // Note numbers appeared in current row
     for(i = 0; i < (MAX) ; i++)
-        b[board[r][i]]=1;
+        b[board[r][i]] = 1;
 
     // Note numbers appeared in current column
     for(i = 0; i < (MAX) ; i++)
-        b[board[i][c]]=1;
+        b[board[i][c]] = 1;
 
     // Note numbers appeared in current block
     r = (r/s)*s, c = (c/s)*s;
     for(i = r; i < r+s; i++)
         for(j = c ; j < c+s ; j++)
-            b[board[i][j]]=1;
+            b[board[i][j]] = 1;
 
     // Fill array possible_values[] with numbers that can be filled in that perticular cell
     for(i = 1 ; i <= (MAX); i++)
         if(!b[i])
-            possible_values[n++]=i;
+            possible_values[n++] = i;
 
     return n;
 }
@@ -151,7 +154,7 @@ void sudoku::solve()
     }
 
     // nothing worked so reset and backtrack
-    board[i][j]=0;
+    board[i][j] = 0;
 }
 
 
@@ -163,14 +166,16 @@ int main()
     sudoku board;
 
     // Input
-    board.take_input();
+    std::cout<<"Enter the Initial "<< 9 <<" X "<< 9 <<" Sudoku "<<std::endl;
+    std::cout<<"Instruction: Enter 0 for blank"<<std::endl;   
+    std::cin >> board;
 
     // Processing
-    std::cout<<"\n\nFinding Solution!\n\n";
+    std::cout << "\n\nFinding Solution!\n\n";
     board.solve();
 
     // output
-    board.display_solution();
+    std::cout << board;
 
     return 0;
 }
